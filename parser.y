@@ -1,82 +1,75 @@
-%{
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "drawings.hpp"
 
-extern int yylineno;
-extern int yycolumn;
-extern int yylex();
-extern int yyparse();
-extern FILE* yyin;
-void yyerror(const char* s);
+%{
+#include <cstdio>
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+
+int yylex(void);
+
+std::ofstream salida("resultado.cpp");
+
+void yyerror(const char *s) {
+    std::cerr << "Error de parseo: " << s << std::endl;
+}
 %}
 
 %union {
-    char c;
-    char* s;
+    char* str;
 }
 
-%token llave_apertura llave_cierre text dp comilla
-%token inicio fin
-%token <c> CARACTER
-%token <c> DIGITO
-%token <s> FIG
-%token <vacio> ignorar
+%token INICIAR FINALIZAR
+%token FUNCION PRINCIPAL
+%token TIPO_FLOAT
+%token SUMAR IMPRIMIR
+%token <str> IDENT
 
 %%
 
 programa:
-    bloque_unico
-    | bloque_inicial bloque_final
-    | bloque_inicial bloques bloque_final
-    ;
+    INICIAR instrucciones FINALIZAR {
+        salida.close();
+        std::cout << "Archivo resultado.cpp generado\n";
+    }
+;
 
-bloque_unico:
-    llave_apertura text dp comilla inicio elementos fin comilla llave_cierre
-    | llave_apertura text dp comilla inicio fin comilla llave_cierre
-    ;
+instrucciones:
+    instruccion
+  | instrucciones instruccion
+;
 
-bloque_inicial:
-    llave_apertura text dp comilla inicio elementos comilla llave_cierre
-    | llave_apertura text dp comilla inicio comilla llave_cierre
-    ;
+instruccion:
+    definicion_funcion
+  | funcion_principal
+;
 
-bloque_final:
-    llave_apertura text dp comilla elementos fin comilla llave_cierre
-    | llave_apertura text dp comilla fin comilla llave_cierre
-    ;
+/* -------- DEFINICIÓN DE FUNCIÓN -------- */
 
-bloques:
-    bloques bloque
-    | bloque
-    ;
+definicion_funcion:
+    FUNCION TIPO_FLOAT SUMAR IDENT IDENT IDENT {
+        salida << "#include <iostream>\n\n";
+        salida << "float sumar(float "
+               << $4 << ", float "
+               << $5 << ", float "
+               << $6 << ") {\n";
+        salida << "    return " << $4
+               << " + " << $5
+               << " + " << $6 << ";\n";
+        salida << "}\n\n";
+    }
+;
 
-bloque:
-    llave_apertura text dp comilla elementos comilla llave_cierre
-    ;
+/* -------- FUNCIÓN PRINCIPAL -------- */
 
-elementos:
-    elementos elemento
-    | elementos ignorar
-    | elemento
-    | ignorar
-    ;
-
-elemento:
-    CARACTER                { dibujarLetra($1); }
-  | DIGITO FIG              { 
-                               int cantidad = $1 - '0'; 
-                               for (int i = 0; i < cantidad; ++i)
-                                 dibujarFigura($2); 
-                               free($2); 
-                            }
-  | FIG                     { dibujarFigura($1); free($1); }
-  | DIGITO                  { dibujarNumero($1); }
-  ;
+funcion_principal:
+    FUNCION PRINCIPAL IMPRIMIR {
+        salida << "int main() {\n";
+        salida << "    float a = 1, b = 2, c = 3;\n";
+        salida << "    std::cout << sumar(a, b, c) << std::endl;\n";
+        salida << "    return 0;\n";
+        salida << "}\n";
+    }
+;
 
 %%
-void yyerror(const char* s) {
-    fprintf(stderr, "Error de sintaxis en linea %d, columna %d: %s\n", yylineno, yycolumn, s);
-    //exit(EXIT_FAILURE);
-}
+

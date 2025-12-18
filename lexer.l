@@ -1,85 +1,38 @@
+
 %{
 #include "parser.tab.h"
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <stdio.h>
-
-int yycolumn = 1;
-
-// Esta macro se ejecuta antes de cada regla
-#define YY_USER_ACTION yycolumn += yyleng;
-
-extern YYSTYPE yylval;
+#include <cstring>
 %}
 
-%option yylineno
-
 %%
+\"text\"[ \t]*:[ \t]*\"   { /* inicio del texto */ }
+\"                        { /* fin del texto */ }
 
-\n      { yylineno++; yycolumn = 1; }
+"iniciar"                 { return INICIAR; }
+"finalizar"               { return FINALIZAR; }
 
-"{"              { printf("LLAVE_APERTURA\n"); return llave_apertura; }
-"\"text\""       { printf("TEXT\n"); return text; }
-":"              { printf("DP\n"); return dp; }
-"\""             { printf("COMILLA\n"); return comilla; }
-"}"              { printf("LLAVE_CIERRE\n"); return llave_cierre; }
+"funcion"                 { return FUNCION; }
+"principal"               { return PRINCIPAL; }
 
-"quiero dibujar" { printf("INICIO\n"); return inicio; }
-"finalizar"      { printf("FIN\n"); return fin; }
+"flotante"                { return TIPO_FLOAT; }
 
-ve([ \t\n\r\"]|$)                           { printf("ELEMENTO: %s\n", yytext); yylval.c = 'B'; yyless(yyleng - 1); return CARACTER; }
-se([ \t\n\r\"]|$)                           { printf("ELEMENTO: %s\n", yytext); yylval.c = 'C'; yyless(yyleng - 1); return CARACTER; }
-de([ \t\n\r\"]|$)                           { printf("ELEMENTO: %s\n", yytext); yylval.c = 'D'; yyless(yyleng - 1); return CARACTER; }
-efe([ \t\n\r\"]|$)                          { printf("ELEMENTO: %s\n", yytext); yylval.c = 'F'; yyless(yyleng - 1); return CARACTER; }
-ge([ \t\n\r\"]|$)                           { printf("ELEMENTO: %s\n", yytext); yylval.c = 'G'; yyless(yyleng - 1); return CARACTER; }
-(hache|che|hace)([ \t\n\r\"]|$)                  { printf("ELEMENTO: %s\n", yytext); yylval.c = 'H'; yyless(yyleng - 1); return CARACTER; }
-jota([ \t\n\r\"]|$)                         { printf("ELEMENTO: %s\n", yytext); yylval.c = 'J'; yyless(yyleng - 1); return CARACTER; }
-ca([ \t\n\r\"]|$)                           { printf("ELEMENTO: %s\n", yytext); yylval.c = 'K'; yyless(yyleng - 1); return CARACTER; }
-(e[ \t]le|ele)([ \t\n\r\"]|$)                          { printf("ELEMENTO: %s\n", yytext); yylval.c = 'L'; yyless(yyleng - 1); return CARACTER; }
-m([ \t\n\r\"]|$)                            { printf("ELEMENTO: %s\n", yytext); yylval.c = 'M'; yyless(yyleng - 1); return CARACTER; }
-ene([ \t\n\r\"]|$)                          { printf("ELEMENTO: %s\n", yytext); yylval.c = 'N'; yyless(yyleng - 1); return CARACTER; }
-(pe|p)([ \t\n\r\"]|$)                       { printf("ELEMENTO: %s\n", yytext); yylval.c = 'P'; yyless(yyleng - 1); return CARACTER; }
-q([ \t\n\r\"]|$)                            { printf("ELEMENTO: %s\n", yytext); yylval.c = 'Q'; yyless(yyleng - 1); return CARACTER; }
-erre([ \t\n\r\"]|$)                         { printf("ELEMENTO: %s\n", yytext); yylval.c = 'R'; yyless(yyleng - 1); return CARACTER; }
-ese([ \t\n\r\"]|$)                          { printf("ELEMENTO: %s\n", yytext); yylval.c = 'S'; yyless(yyleng - 1); return CARACTER; }
-te([ \t\n\r\"]|$)                           { printf("ELEMENTO: %s\n", yytext); yylval.c = 'T'; yyless(yyleng - 1); return CARACTER; }
-(uve|hube)([ \t\n\r\"]|$)                   { printf("ELEMENTO: %s\n", yytext); yylval.c = 'V'; yyless(yyleng - 1); return CARACTER; }
-(doble[ \t]+u|doble[ \t]+un)([ \t\n\r\"]|$) { printf("ELEMENTO: %s\n", yytext); yylval.c = 'W'; yyless(yyleng - 1); return CARACTER; }
-equis([ \t\n\r\"]|$)                        { printf("ELEMENTO: %s\n", yytext); yylval.c = 'X'; yyless(yyleng - 1); return CARACTER; }
-y([ \t\n\r\"]|$)                            { printf("ELEMENTO: %s\n", yytext); yylval.c = 'Y'; yyless(yyleng - 1); return CARACTER; }
-zeta([ \t\n\r\"]|$)                         { printf("ELEMENTO: %s\n", yytext); yylval.c = 'Z'; yyless(yyleng - 1); return CARACTER; }
+"sume"|"sumar"            { return SUMAR; }
 
-círculos([ \t\n\r\"]|$)       { printf("ELEMENTO: %s\n", yytext); yylval.s = strdup("circulo"); yyless(yyleng - 1); return FIG; }
-cuadrados([ \t\n\r\"]|$)      { printf("ELEMENTO: %s\n", yytext); yylval.s = strdup("cuadrado"); yyless(yyleng - 1); return FIG; }
-triángulos([ \t\n\r\"]|$)     { printf("ELEMENTO: %s\n", yytext); yylval.s = strdup("triangulo"); yyless(yyleng - 1); return FIG; }
+"imprima"|"imprimir"      { return IMPRIMIR; }
 
-círculo([ \t\n\r\"]|$)       { printf("ELEMENTO: %s\n", yytext); yylval.s = strdup("circulo"); yyless(yyleng - 1); return FIG; }
-cuadrado([ \t\n\r\"]|$)      { printf("ELEMENTO: %s\n", yytext); yylval.s = strdup("cuadrado"); yyless(yyleng - 1); return FIG; }
-triángulo([ \t\n\r\"]|$)     { printf("ELEMENTO: %s\n", yytext); yylval.s = strdup("triangulo"); yyless(yyleng - 1); return FIG; }
+"que"|"una"|"y"|"el"|"la"|"resultado"|"instrucciones"|"haz" {
+    /* palabras de relleno */
+}
 
-(á|a)([ \t\n\r\"]|$)              { printf("ELEMENTO: %s\n", yytext); yylval.c = 'A'; yyless(yyleng - 1); return CARACTER; }
-(é|e|eh)([ \t\n\r\"]|$)           { printf("ELEMENTO: %s\n", yytext); yylval.c = 'E'; yyless(yyleng - 1); return CARACTER; }
-(y[ \t]+latina)([ \t\n\r\"]|$)    { printf("ELEMENTO: %s\n", yytext); yylval.c = 'I'; yyless(yyleng - 1); return CARACTER; }
-(ó|o)([ \t\n\r\"]|$)              { printf("ELEMENTO: %s\n", yytext); yylval.c = 'O'; yyless(yyleng - 1); return CARACTER; }
-(ú|u)([ \t\n\r\"]|$)              { printf("ELEMENTO: %s\n", yytext); yylval.c = 'U'; yyless(yyleng - 1); return CARACTER; }
+[a-zA-Z]+ {
+    yylval.str = strdup(yytext);
+    return IDENT;
+}
 
-"cero"             { printf("ELEMENTO: %s\n", yytext); yylval.c = '0'; return DIGITO; }
-"uno"              { printf("ELEMENTO: %s\n", yytext); yylval.c = '1'; return DIGITO; }
-"dos"              { printf("ELEMENTO: %s\n", yytext); yylval.c = '2'; return DIGITO; }
-"tres"             { printf("ELEMENTO: %s\n", yytext); yylval.c = '3'; return DIGITO; }
-"cuatro"           { printf("ELEMENTO: %s\n", yytext); yylval.c = '4'; return DIGITO; }
-"cinco"            { printf("ELEMENTO: %s\n", yytext); yylval.c = '5'; return DIGITO; }
-"seis"             { printf("ELEMENTO: %s\n", yytext); yylval.c = '6'; return DIGITO; }
-"siete"            { printf("ELEMENTO: %s\n", yytext); yylval.c = '7'; return DIGITO; }
-"ocho"             { printf("ELEMENTO: %s\n", yytext); yylval.c = '8'; return DIGITO; }
-"nueve"            { printf("ELEMENTO: %s\n", yytext); yylval.c = '9'; return DIGITO; }
+[ \t\n]+                  { /* ignorar */ }
 
-[ \t\n\r]+      { }
-
-[a-záéíóúA-Z]+               { printf("Ignorado: %s\n", yytext); return ignorar; }
-(y[ \t]+la)([ \t\n\r\"]|$)   { printf("Ignorado: %s\n", yytext); yyless(yyleng - 1); return ignorar; }
-
+.                          { /* ignorar */ }
 %%
 
 int yywrap() { return 1; }
+
