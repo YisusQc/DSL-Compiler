@@ -37,7 +37,7 @@ int main() {
         fprintf(out, "%s\n", result);
         fclose(out);
       }
-      // Salir si se dice "finalizar"
+      // Salir si se dice palabra clave
       if (strstr(result, "finalizar") != nullptr) {
         printf("Se detecto la palabra clave 'finalizar'. Reconocimiento terminado\n");
         break;
@@ -49,7 +49,6 @@ int main() {
     }
   }
 
-  // Limpieza
   Pa_StopStream(stream);
   Pa_CloseStream(stream);
   Pa_Terminate();
