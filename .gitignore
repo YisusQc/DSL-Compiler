@@ -11,3 +11,6 @@ lex.yy.c
 
 *.wav
 *.txt
+
+resultado.cpp
+
