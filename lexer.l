@@ -11,16 +11,16 @@
 <TEXTMODE>\"              { BEGIN(INITIAL); }
 
 <TEXTMODE>"iniciar programa"        { printf("TOKEN: '%s'\n", yytext); return INICIAR; }
-<TEXTMODE>"finalizar programa"      { return FINALIZAR; }
+<TEXTMODE>"terminar programa"      { printf("TOKEN: '%s'\n", yytext); return FINALIZAR; }
 
 <TEXTMODE>"entera"|"entero"          { printf("TOKEN: '%s'\n", yytext); return TIPO_INT; }
 <TEXTMODE>"flotante"                 { printf("TOKEN: '%s'\n", yytext); return TIPO_FLOAT; }
 
-<TEXTMODE>"crear funcion principal"|"crea funcion principal"  { printf("TOKEN: '%s'\n", yytext); return PRINCIPAL; }
+<TEXTMODE>"crear función principal"|"crea función principal"  { printf("TOKEN: '%s'\n", yytext); return PRINCIPAL; }
 
-<TEXTMODE>"crear funcion"|"crea funcion"|"crea una funcion"        { printf("TOKEN: '%s'\n", yytext); return FUNCION; }
+<TEXTMODE>"crear función"|"crea función"|"crea una función"        { printf("TOKEN: '%s'\n", yytext); return FUNCION; }
 
-<TEXTMODE>"con parametro"|"con parametros"          { printf("TOKEN: '%s'\n", yytext); return PARAMETRO; }
+<TEXTMODE>"con parámetro"|"con parámetros"          { printf("TOKEN: '%s'\n", yytext); return PARAMETRO; }
 
 <TEXTMODE>"con argumento"|"con argumentos"          { printf("TOKEN: '%s'\n", yytext); return ARGUMENTO; }
 
@@ -39,7 +39,7 @@
 <TEXTMODE>"imprimir texto"           { return IMPRIMIR_TEXTO; }
 <TEXTMODE>"fin texto"                { return FIN_TEXTO; }
 
-<TEXTMODE>"que"|"una"|"y"|"el"|"la"|"resultado"|"instrucciones"|"haz"                     { /* ignorar */ }
+<TEXTMODE>"que"|"una"|"y"|"el"|"la"|"resultado"|"instrucciones"|"haz"|"en"                     { /* ignorar */ }
 
 <TEXTMODE>[a-zA-Z]+ {
     printf("IDENT: '%s'\n", yytext);

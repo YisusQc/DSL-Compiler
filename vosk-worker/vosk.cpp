@@ -38,8 +38,8 @@ int main() {
         fclose(out);
       }
       // Salir si se dice palabra clave
-      if (strstr(result, "finalizar") != nullptr) {
-        printf("Se detecto la palabra clave 'finalizar'. Reconocimiento terminado\n");
+      if (strstr(result, "terminar programa") != nullptr) {
+        printf("Se detecto la palabra clave para interrumpir. Reconocimiento terminado\n");
         break;
       }
   } else {
