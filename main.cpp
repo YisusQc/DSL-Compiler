@@ -1,7 +1,9 @@
 #include <cstdio>
 #include <iostream>
 #include <cstdlib>
+#include "ast.hpp"
 
+extern std::unique_ptr<ProgramNode> root;
 extern FILE* yyin;
 extern int yyparse();
 
@@ -26,6 +28,11 @@ int main() {
 
   std::cout << "Parseando...\n";
   yyparse();
+
+  if (root) {
+      generateCode(root.get());
+  }
+
   fclose(yyin);
   std::cout << "Parseo terminado\n";
 

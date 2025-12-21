@@ -1,41 +1,66 @@
+%code requires {
+    #include <vector>
+    #include <string>
+    #include "ast.hpp"
+}
 
 %{
-#include <cstdio>
-#include <cstdlib>
-#include <fstream>
 #include <iostream>
+#include <memory>
+#include <cstring>
+#include "ast.hpp"
 
 int yylex(void);
 
-std::ofstream salida("resultado.cpp");
-
 void yyerror(const char *s) {
-    std::cerr << "Error de parseo: " << s << std::endl;
+  std::cerr << "Error de parseo: " << s << std::endl;
 }
+
+std::unique_ptr<ProgramNode> root;
 %}
 
 %union {
     char* str;
+    ASTNode* node;
+    std::vector<ASTNode*>* nodelist;
+    std::vector<std::string>* strlist;
 }
 
+%type <node> instruccion definicion_funcion funcion_principal
+%type <nodelist> instrucciones
+%type <strlist> parametros
+%type <str> tipo
+
 %token INICIAR FINALIZAR
+%token TIPO_INT TIPO_FLOAT
 %token FUNCION PRINCIPAL
-%token TIPO_FLOAT
-%token SUMAR IMPRIMIR
+%token PARAMETRO ARGUMENTO
+%token CREAR_VARIABLE ASIGNAR_VARIABLE VALOR
+%token DESDE HASTA I
+%token IMPRIMIR IMPRIMIR_TEXTO FIN_TEXTO
 %token <str> IDENT
+%token <str> TEXTO
 
 %%
 
 programa:
     INICIAR instrucciones FINALIZAR {
-        salida.close();
-        std::cout << "Archivo resultado.cpp generado\n";
+        root = std::make_unique<ProgramNode>();
+        for (auto n : *$2)
+            root->instructions.emplace_back(n);
+        delete $2;
     }
 ;
 
 instrucciones:
-    instruccion
-  | instrucciones instruccion
+    instruccion {
+        $$ = new std::vector<ASTNode*>();
+        $$->push_back($1);
+    }
+  | instrucciones instruccion {
+        $$ = $1;
+        $$->push_back($2);
+    }
 ;
 
 instruccion:
@@ -43,31 +68,36 @@ instruccion:
   | funcion_principal
 ;
 
-/* -------- DEFINICIÓN DE FUNCIÓN -------- */
+tipo:
+    TIPO_INT    { $$ = strdup("int"); }
+  | TIPO_FLOAT  { $$ = strdup("float"); }
+;
 
 definicion_funcion:
-    FUNCION TIPO_FLOAT SUMAR IDENT IDENT IDENT {
-        salida << "#include <iostream>\n\n";
-        salida << "float sumar(float "
-               << $4 << ", float "
-               << $5 << ", float "
-               << $6 << ") {\n";
-        salida << "    return " << $4
-               << " + " << $5
-               << " + " << $6 << ";\n";
-        salida << "}\n\n";
+    FUNCION tipo IDENT PARAMETRO parametros {
+        auto fn = new FunctionNode();
+        fn->returnType = $2;
+        fn->name = $3;
+        fn->params = *$5;
+        delete $5;
+        $$ = fn;
     }
 ;
 
-/* -------- FUNCIÓN PRINCIPAL -------- */
-
 funcion_principal:
-    FUNCION PRINCIPAL IMPRIMIR {
-        salida << "int main() {\n";
-        salida << "    float a = 1, b = 2, c = 3;\n";
-        salida << "    std::cout << sumar(a, b, c) << std::endl;\n";
-        salida << "    return 0;\n";
-        salida << "}\n";
+    PRINCIPAL {
+        $$ = new MainFunctionNode();
+    }
+;
+
+parametros:
+    IDENT {
+        $$ = new std::vector<std::string>();
+        $$->push_back($1);
+    }
+  | parametros IDENT {
+        $$ = $1;
+        $$->push_back($2);
     }
 ;
 
