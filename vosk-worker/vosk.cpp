@@ -38,7 +38,7 @@ int main() {
         fclose(out);
       }
       // Salir si se dice palabra clave
-      if (strstr(result, "terminar programa") != nullptr) {
+      if (strstr(result, "finalizar programa") != nullptr) {
         printf("Se detecto la palabra clave para interrumpir. Reconocimiento terminado\n");
         break;
       }

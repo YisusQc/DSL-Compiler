@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <iostream>
 #include <cstdlib>
+#include <fstream>
 #include "ast.hpp"
 
 extern std::unique_ptr<ProgramNode> root;
@@ -30,8 +31,10 @@ int main() {
   yyparse();
 
   if (root) {
-      generateCode(root.get());
-  }
+        std::ofstream out("resultado.cpp");
+        root->generate(out);
+        std::cout << "Archivo resultado.cpp generado\n";
+    }
 
   fclose(yyin);
   std::cout << "Parseo terminado\n";
